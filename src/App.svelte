@@ -1,47 +1,72 @@
 <script lang="ts">
-  import svelteLogo from './assets/svelte.svg'
-  import viteLogo from '/vite.svg'
-  import Counter from './lib/Counter.svelte'
+  import Header from "./components/Header.svelte";
+  let formState = $state({
+    name: "",
+    birthday: "",
+    step: 0,
+    error: "",
+  });
+  const QUESTIONS = [
+    {
+      question: "What is your name?",
+      id: "name",
+      type: "text",
+    },
+    {
+      question: "What is your birthday?",
+      id: "bday",
+      type: "date",
+    },
+  ];
 </script>
 
+<Header name={formState.name}>
+  <p>Hello</p>
+  {#snippet secondChild(name)}
+    <p>Second Child: {name}</p>
+  {/snippet}
+</Header>
+
 <main>
-  <div>
-    <a href="https://vite.dev" target="_blank" rel="noreferrer">
-      <img src={viteLogo} class="logo" alt="Vite Logo" />
-    </a>
-    <a href="https://svelte.dev" target="_blank" rel="noreferrer">
-      <img src={svelteLogo} class="logo svelte" alt="Svelte Logo" />
-    </a>
-  </div>
-  <h1>Vite + Svelte</h1>
+  <p>Step: {formState.step + 1}</p>
 
-  <div class="card">
-    <Counter />
-  </div>
+  <!-- {#each QUESTIONS as question (question.id)} -->
+  {#each QUESTIONS as question (question.id)}
+    {@render formStep(question)}
+  {/each}
+  <!-- {#each QUESTIONS as { id, question, type } (id)}
+    {@render formStep({
+      question,
+      id,
+      type,
+    })}
+  {/each} -->
 
-  <p>
-    Check out <a href="https://github.com/sveltejs/kit#readme" target="_blank" rel="noreferrer">SvelteKit</a>, the official Svelte app framework powered by Vite!
-  </p>
-
-  <p class="read-the-docs">
-    Click on the Vite and Svelte logos to learn more
-  </p>
+  {#if formState.error}
+    <p class="error">{formState.error}</p>
+  {/if}
 </main>
 
+<!-- snippets -> reusable code templates -->
+{#snippet formStep({
+  question,
+  id,
+  type,
+}: {
+  type: string;
+  question: string;
+  id: string;
+})}
+  <article>
+    <div>
+      <label for={id}>{question}</label>
+      <input {type} {id} bind:value={formState[id]} />
+    </div>
+  </article>
+{/snippet}
+
 <style>
-  .logo {
-    height: 6em;
-    padding: 1.5em;
-    will-change: filter;
-    transition: filter 300ms;
-  }
-  .logo:hover {
-    filter: drop-shadow(0 0 2em #646cffaa);
-  }
-  .logo.svelte:hover {
-    filter: drop-shadow(0 0 2em #ff3e00aa);
-  }
-  .read-the-docs {
-    color: #888;
+  .error {
+    color: red;
   }
 </style>
